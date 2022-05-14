@@ -41,7 +41,6 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-
 /* USER CODE BEGIN PV */
 int16_t value = 0;
 /* USER CODE END PV */
@@ -94,7 +93,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-
   /* USER CODE BEGIN 2 */
   us100_init();
   motor_control_init();
@@ -157,8 +155,6 @@ void SystemClock_Config(void)
   }
 }
 
-
-
 /**
   * @brief GPIO Initialization Function
   * @param None
@@ -170,6 +166,7 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
 
 }
 
