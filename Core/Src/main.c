@@ -107,7 +107,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+	  set_motor_speed(30, 30);
 	  value = get_dist(1);
 	  printf("D = %d mm\n\r", value);
 	  HAL_Delay(100);
