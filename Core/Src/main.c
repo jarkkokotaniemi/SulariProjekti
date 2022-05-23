@@ -41,6 +41,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+
+
 /* USER CODE BEGIN PV */
 int16_t value = 0;
 /* USER CODE END PV */
@@ -48,6 +50,7 @@ int16_t value = 0;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -93,6 +96,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+
   /* USER CODE BEGIN 2 */
   us100_init();
   motor_control_init();
@@ -105,11 +109,19 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  set_motor_speed(30, 30);
-	  value = get_dist(1);
-	  printf("D = %d mm\n\r", value);
-	  HAL_Delay(100);
 
+	  //value = get_dist(1);
+	  //printf("D = %d mm\n\r", value);
+	  set_motor_speed(30, -30);
+	  HAL_Delay(1000);
+	  set_motor_speed(-30, 30);
+	  HAL_Delay(1000);
+	  set_motor_speed(-30, -30);
+	  HAL_Delay(1000);
+	  set_motor_speed(30, 30);
+	  HAL_Delay(1000);
+	  set_motor_speed(0, 0);
+	  HAL_Delay(1000);
 
   }
   /* USER CODE END 3 */
@@ -154,6 +166,7 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 }
+
 
 /**
   * @brief GPIO Initialization Function

@@ -6,13 +6,15 @@
  */
 
 #include "motor_control.h"
+#include <math.h>
 
 
 TIM_HandleTypeDef htim3;
 
-int16_t wheel1_distance = 0;
-int16_t wheel2_distance = 0;
-int16_t speed_to_wheel = 0.01; // satunnainen arvaus, pitää kalibroida.
+float speed_to_wheel_velocity = 0.01; // satunnainen arvaus, pitää kalibroida.
+float L = 0.15;
+float dt = 0.1; // aikasteppi???
+float x, new_x, y, new_y, heading, new_heading, R, V_l, V_r, angular_V = 0.0;
 
 static void MX_TIM3_Init(void);
 
@@ -36,27 +38,44 @@ void set_motor_speed(int8_t speed1, int8_t speed2)
 	{
 		TIM3->CCR1 = 0;
 		TIM3->CCR2 = -speed1;
-		wheel1_distance += speed1*speed_to_wheel;
 	}
 	else  // wheel1 forwards
 	{
 		TIM3->CCR1 = speed1;
 		TIM3->CCR2 = 0;
-		wheel1_distance += speed1*speed_to_wheel;
 	}
 
 	if(speed2 < 0)  // wheel2 backwards
 	{
 		TIM3->CCR3 = 0;
 		TIM3->CCR4 = -speed2;
-		wheel2_distance += speed2*speed_to_wheel;
 	}
 	else  // wheel1 forwards
 	{
 		TIM3->CCR3 = speed2;
 		TIM3->CCR4 = 0;
-		wheel2_distance += speed2*speed_to_wheel;
 	}
+
+	if(speed1 != speed2)
+	{
+		V_l = speed1*speed_to_wheel_velocity; // ground velocity of the left wheel
+		V_r = speed2*speed_to_wheel_velocity; // ground velocity of the right wheel
+		angular_V = (V_r-V_l)/L; // angular velocity around the ICC
+		R = (L*(V_l+V_r))/(2*(V_r-V_l)); // radius of the turning circle around the ICC
+		new_x = -R*sin(heading) + R*sin(heading+dt*angular_V) + x;
+		new_y = R*cos(heading) - R*cos(heading+dt*angular_V) + y;
+		new_heading = dt*angular_V + heading;
+	}
+	else
+	{
+		V_l = speed1*speed_to_wheel_velocity;
+		new_x = V_l*dt*cos(heading) + x;
+		new_y = V_l*dt*sin(heading) + y;
+		new_heading = heading;
+	}
+	x = new_x;
+	y = new_y;
+	heading = new_heading;
 }
 
 static void MX_TIM3_Init(void)
@@ -94,7 +113,7 @@ static void MX_TIM3_Init(void)
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
   sConfigOC.Pulse = 0;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
